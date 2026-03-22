@@ -12,7 +12,7 @@ LOG_DIR.mkdir(exist_ok=True)
 class Honeypot :
     
     #Constructeur (on initialise l'ip, les ports a observé, les connexions et les fichiers de log)
-    def __init__(self, ip="0.0.0.0", ports = [7655]):
+    def __init__(self, ip="0.0.0.0", ports = [80, 8080]):
         self.ip = ip
         self.ports = ports
         self.connexion_active = {}
