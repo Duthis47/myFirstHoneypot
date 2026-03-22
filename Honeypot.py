@@ -22,7 +22,7 @@ class Honeypot :
     def log_activity(self, port, remote_ip, data):
         activity = {
             "timestamp" : datetime.datetime.now().isoformat(),
-            "data" : data,
+            "data" : data.decode('utf-8', errors='ignore'),
             "port" : port,
             "ip_distante" : remote_ip
         }
