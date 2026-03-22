@@ -1,5 +1,5 @@
 import socket
-import sys
+import sys, os, subprocess
 import datetime
 import json
 import threading
@@ -59,8 +59,12 @@ class Honeypot :
                 #On log l'activité du client
                 self.log_activity(port, ip_distante, data)
                 
-                #On simule une réponse
-                socket_client.send(b"Command not recognized.\r\n")
+                if port == 80:
+                    chaine = self.action_shell(data, socket_client)
+                    socket_client.send(chaine)
+                else : 
+                    #On simule une réponse
+                    socket_client.send(b"Command not recognized.\r\n")
 
         except Exception as e:
             print(f"Error connection{e}")
@@ -92,3 +96,14 @@ class Honeypot :
                 
         except Exception as e : 
             print(f"Error starting listener on port {port}: {e}")
+            
+            
+        def action_shell(self, data, socket_client):
+            data = data.decode('utf-8', errors='ignore')
+            if data.startswith("pwd") or data.startswith("ls"): 
+                resultat = subprocess.run(['pwd'], capture_output=True, text=True)
+                x = resultat.stdout.strip()
+                print(x)
+                return b"Va te faire"
+            else : 
+                return b"Non reconnue"
