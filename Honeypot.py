@@ -18,6 +18,9 @@ class Honeypot :
         self.connexion_active = {}
         self.log_file = LOG_DIR / f"honeypot{datetime.datetime.now().strftime('%d%m%Y')}.json"
         
+        #Poursuivre en différenciant les commandes que j'authorise, les commandes que je modifie pour cacher et celles que j'interdit
+        self.authorized_commands = ["pwd", "ls"]
+        self.modified_commands = ["whoami"]
     #Fonction pour enregistrer l'activité d'un utilisateur
     def log_activity(self, port, remote_ip, data):
         activity = {
@@ -29,7 +32,6 @@ class Honeypot :
         
         #On récupère le fichier de log
         with open(self.log_file, 'a') as file:
-            print("here")
             json.dump(activity, file)
             file.write('\n')
             
@@ -98,12 +100,13 @@ class Honeypot :
             print(f"Error starting listener on port {port}: {e}")
             
             
-        def action_shell(self, data, socket_client):
-            data = data.decode('utf-8', errors='ignore')
-            if data.startswith("pwd") or data.startswith("ls"): 
-                resultat = subprocess.run(['pwd'], capture_output=True, text=True)
+    def action_shell(self, data, socket_client):
+        data = data.decode('utf-8', errors='ignore')
+        for i in self.authorized_commands :
+            if data.startswith(i): 
+                resultat = subprocess.run([i], capture_output=True, text=True)
                 x = resultat.stdout.strip()
-                print(x)
-                return b"Va te faire"
-            else : 
-                return b"Non reconnue"
+                return x.encode()
+        
+        
+        return b"Non non non"
